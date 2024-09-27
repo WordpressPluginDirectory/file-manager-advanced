@@ -4,7 +4,7 @@ Tags: file manager, wordpress file manager, wp file manager, file manager pro, d
 Requires at least: 4.0
 Tested up to: 6.6.2
 Requires PHP: 7.0
-Stable tag: 5.2.9
+Stable tag: 5.2.10
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -111,6 +111,9 @@ Yes you can, go to settings, change root path.
 
 
 == Changelog ==
+
+= 5.2.10 (26th Sep, 2024) =
+* Broken Shortcode issue fixes
 
 = 5.2.9 (25th Sep, 2024) =
 * Subscriber-level access issues fixes 

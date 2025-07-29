@@ -32,7 +32,7 @@ class elFinder
      *
      * @var integer
      */
-    protected static $ApiRevision = 65;
+    protected static $ApiRevision = 64;
 
     /**
      * Storages (root dirs)
@@ -2008,6 +2008,14 @@ class elFinder
                 if (!is_file($src) || !($fp = fopen($src, 'rb'))) {
                     return $a404;
                 }
+
+                $realSrc    = realpath( $src );
+                $realTmpDir = realpath( $tmpdir );
+                if ( ! $realSrc || ! $realTmpDir || 0 !== strpos( $realSrc, $realTmpDir ) ) {
+                    fclose( $fp );
+                    return $a403;
+                }
+
                 if (strpos($src, $tmpdir) === 0) {
                     $GLOBALS['elFinderTempFiles'][$src] = true;
                 }
@@ -5368,14 +5376,25 @@ var go = function() {
     public static function onShutdown()
     {
         self::$abortCheckFile = null;
-        if (!empty($GLOBALS['elFinderTempFps'])) {
-            foreach (array_keys($GLOBALS['elFinderTempFps']) as $fp) {
-                is_resource($fp) && fclose($fp);
+
+        if ( ! empty( $GLOBALS['elFinderTempFps'] ) ) {
+            foreach ( array_keys( $GLOBALS['elFinderTempFps'] ) as $fp ) {
+                is_resource( $fp ) && fclose( $fp );
             }
         }
-        if (!empty($GLOBALS['elFinderTempFiles'])) {
-            foreach (array_keys($GLOBALS['elFinderTempFiles']) as $f) {
-                is_file($f) && is_writable($f) && unlink($f);
+
+        if ( ! empty( $GLOBALS['elFinderTempFiles'] ) ) {
+            $tempPathConfig = self::$commonTempPath ?: sys_get_temp_dir();
+            $baseDir = realpath( $tempPathConfig );
+
+            if ( $baseDir && is_dir( $baseDir ) ) {
+                foreach ( $GLOBALS['elFinderTempFiles'] as $f ) {
+                    $realF = realpath( $f );
+
+                    if ( false !== $realF && is_file( $realF ) && is_writable( $realF ) && 0 === strpos( $realF, $baseDir . DIRECTORY_SEPARATOR ) ) {
+                        unlink( $realF );
+                    }
+                }
             }
         }
     }

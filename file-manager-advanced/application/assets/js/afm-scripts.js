@@ -43,8 +43,28 @@
         ).catch( error => console.error( 'Error:', error ) );
     } );
 
-    $( '.dropbox__wrap' ).on( 'click', function() {
+    $( '.dropbox__wrap, .file-logs__wrap, .fma__wrap' ).on( 'click', function() {
+
+        var redirect_url = $( this ).attr( 'afmp-href' );
+        if ( ! redirect_url ) {
+            redirect_url = '';
+        }
+
+        file_manager_advanced_popup( redirect_url, '', '' );
+    } );
+
+    $( '.googledrive__wrap' ).on( 'click', function() {
+        file_manager_advanced_popup( 
+			'https://advancedfilemanager.com/pricing/?utm_source=plugin&utm_medium=google_drive_banner&utm_campaign=plugin',
+			'',
+			''
+		);
+    } );
+    $( '.dropbox__wrap, .onedrive__wrap' ).on( 'click', function() {
         file_manager_advanced_popup( '', '', '' );
+    } );
+    $( '.aws__wrap' ).on( 'click', function() {
+        file_manager_advanced_popup( 'https://advancedfilemanager.com/pricing/?utm_source=plugin&utm_medium=aws_banner&utm_campaign=plugin', '', '' );
     } );
 
     function file_manager_advanced_popup( redirect_url = '', message = '', button_title = '' ) {

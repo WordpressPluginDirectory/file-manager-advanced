@@ -38,6 +38,9 @@ class class_fma_main {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		// Hook into WordPress to handle slashes in POST data for elFinder
 		add_action( 'init', array( $this, 'handle_elfinder_post_data' ) );
+		
+		// Initialize SMTP recommendation
+		$this->init_smtp_recommendation();
 	}
 
 	/**
@@ -353,6 +356,29 @@ class class_fma_main {
 			// Remove slashes from content before elFinder processes it
 			$_POST['content'] = wp_unslash( $_POST['content'] );
 		}
+	}
+
+	/**
+	 * Initialize SMTP recommendation using universal system
+	 * @since 6.7.3
+	 */
+	private function init_smtp_recommendation() {
+		// if ( ! class_exists( 'Recommend_Post_SMTP_Admin_Notice' ) ) {
+		// 	require_once FMAFILEPATH . 'application/post-smtp-notice/recommend-post-smtp-admin-notice.php';
+		// 	$recommend_smtp_admin_notice = Recommend_Post_SMTP_Admin_Notice::get_instance();
+		// 	$recommend_smtp_admin_notice->set_plugin_info( 'fma', 'png' );
+		// }
+		require_once FMAFILEPATH . 'application/post-smtp-notice/recommend-post-smtp-loader.php';
+
+		// Unique ID per plugin (slug, name, etc.)
+		$recommend_smtp = recommend_smtp_loader(
+			'fma',     // unique plugin ID
+			'file-manager-advanced',   // your plugin slug
+			true,            // show admin notice
+			'file_manager_advanced_ui',           // parent menu
+			'png'            // logo format
+		);
+
 	}
 
 	public static function has_pro() {

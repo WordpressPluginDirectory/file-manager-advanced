@@ -213,9 +213,11 @@ A file was {event} by {username} on {date_time}. The file name is {file_name} wi
             );
         }
 
-        if(!class_exists('file_manager_advanced_shortcode')) {
-		    add_submenu_page( 'file_manager_advanced_ui', 'Shortcodes', 'Shortcodes', $subPer, 'file_manager_advanced_shortcodes', array(&$this, 'file_manager_advanced_shortcodes'));
-	    }
+        // Blocks submenu is now handled by class_fma_blocks
+        // Old submenu removed - blocks post type is used instead
+        // if(!class_exists('file_manager_advanced_shortcode')) {
+		//     add_submenu_page( 'file_manager_advanced_ui', 'Blocks', 'Blocks', $subPer, 'file_manager_advanced_shortcodes', array(&$this, 'file_manager_advanced_shortcodes'));
+	    // }
 
 		if ( ! class_exists( 'AFMP\\Modules\\Adminer' ) ) {
 			add_submenu_page( 'file_manager_advanced_ui', 'DB Access', 'DB Access', 'manage_options', 'afmp-adminer', array( $this, 'adminer_menu' ) );

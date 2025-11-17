@@ -64,6 +64,17 @@
     $( '.dropbox__wrap, .onedrive__wrap' ).on( 'click', function() {
         file_manager_advanced_popup( '', '', '' );
     } );
+    
+    // Use event delegation for blocks wrap (since it's added dynamically)
+    // Same behavior as OneDrive/Dropbox - empty string for default popup
+    $( document ).on( 'click', '.fma__blocks__wrap', function() {
+        var redirect_url = $( this ).attr( 'afmp-href' );
+        if ( ! redirect_url ) {
+            redirect_url = 'https://advancedfilemanager.com/pricing/?utm_source=plugin&utm_medium=blocks_banner&utm_campaign=plugin';
+        }
+        file_manager_advanced_popup( redirect_url, '', '' );
+        return false;
+    } );
 
     $( '.aws__wrap' ).on( 'click', function() {
         file_manager_advanced_popup( 'https://advancedfilemanager.com/pricing/?utm_source=plugin&utm_medium=aws_banner&utm_campaign=plugin', '', '' );

@@ -134,7 +134,7 @@ Install Post SMTP — trusted by 400,000+ websites for reliable delivery, detail
      */
     public function hide_post_smtp_recommendation_notice() {
         if( ! current_user_can( 'manage_options' ) || ! isset( $_GET['nonce'] ) || ! wp_verify_nonce( $_GET['nonce'], 'hide-post-smtp-recommendation-notice' ) ) {
-            wp_die( __( 'Security Check.', 'post-smtp' ) );
+            wp_die( __( 'Security Check.', 'file-manager-advanced' ) );
         }
 
         if( isset( $_GET['action'] ) && $_GET['action'] === 'hide-post-smtp-recommendation-notice' ) {
@@ -219,10 +219,18 @@ Install Post SMTP — trusted by 400,000+ websites for reliable delivery, detail
      * Callback for the rest route
      */
     public function request_post_smtp( $request ) {
+        if ( ! \RecommendPostSMTP\Base\Recommend_Post_SMTP_Base::has_data_consent() ) {
+            wp_send_json_success( array(
+                'message' => __( 'Action completed (data sharing skipped — no consent)', 'file-manager-advanced' ),
+                'consent' => false
+            ) );
+            return;
+        }
+
         $site_url = get_bloginfo( 'url' );
         $status = $request->get_param( 'status' );
         $plugin_slug = $this->slug;
-        $secret_key = 'WP_*#KXs2)34KM@_-*^%?>"}0!@~\@4C2*0A^%(%MVBS';
+        $secret_key = \RecommendPostSMTP\Base\Recommend_Post_SMTP_Base::get_site_secret_key();
 
         $response = wp_remote_post( "https://connect.postmansmtp.com/wp-json/update/v1/update?site_url={$site_url}&status={$status}&plugin_slug={$plugin_slug}", array(
             'method'      => 'POST',
@@ -233,7 +241,7 @@ Install Post SMTP — trusted by 400,000+ websites for reliable delivery, detail
         ) );
 
         wp_send_json_success( array(
-            'message' => __( 'Request sent successfully', 'post-smtp' )
+            'message' => __( 'Request sent successfully', 'file-manager-advanced' )
         ) );
     }
 
@@ -242,11 +250,18 @@ Install Post SMTP — trusted by 400,000+ websites for reliable delivery, detail
      */
     public function admin_enqueue_scripts() {
         wp_enqueue_script( 'recommend-post-smtp-script', plugin_dir_url( __FILE__ ) . 'assets/js/admin-script.js', array( 'updates', 'jquery' ), '1.0.0', true );
+        $has_consent = false;
+        if ( class_exists( 'RecommendPostSMTP\\Base\\Recommend_Post_SMTP_Base' ) ) {
+            $has_consent = \RecommendPostSMTP\Base\Recommend_Post_SMTP_Base::has_data_consent();
+        }
         wp_localize_script( 'recommend-post-smtp-script', 'recommendPostSMTP', array(
             'redirectURL'   => admin_url( "admin-post.php?action=hide-post-smtp-recommendation-notice&nonce=" . wp_create_nonce( 'hide-post-smtp-recommendation-notice' ) ),
             'postSMTPURL'   => admin_url( "admin.php?page=postman" ),
             'XWPNonce'      => wp_create_nonce( 'wp_rest' ),
-            'restURL'       => rest_url()
+            'restURL'       => rest_url(),
+            'ajaxURL'       => admin_url( 'admin-ajax.php' ),
+            'ajaxNonce'     => wp_create_nonce( 'post_smtp_request_nonce' ),
+            'hasConsent'    => $has_consent,
         ) );
     }
 }
